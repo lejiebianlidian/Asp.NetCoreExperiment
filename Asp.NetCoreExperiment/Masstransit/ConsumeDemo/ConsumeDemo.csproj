@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit" Version="5.5.6-develop.2181" />
+    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="5.5.6-develop.2181" />
+    <PackageReference Include="MassTransit.Quartz" Version="5.5.6-develop.2181" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="5.5.6-develop.2181" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MassTransitEntity\MassTransitEntity.csproj" />
+  </ItemGroup>
+
+</Project>

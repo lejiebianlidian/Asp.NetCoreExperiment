@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace DIChainOfResponsibility.Controllers
@@ -7,43 +8,34 @@ namespace DIChainOfResponsibility.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        readonly ParentTransfer _starPayTransfer;
-        public ValuesController(ParentTransfer starPayTransfer)
+        /// <summary>
+        /// 第一个任务
+        /// </summary>
+        readonly ITask _task;
+
+        public ValuesController(FirstTask firstTask)
         {
-            _starPayTransfer = starPayTransfer;
+            _task = firstTask;
         }
-        // GET api/values
+        //错误姿势
+        //public ValuesController(IEnumerable<ITask> tasks)
+        //{
+        //    foreach (var task in tasks)
+        //    {
+        //        if (task is EndTask)
+        //        {
+        //            _task = task;
+        //        }
+        //    }
+        //}
+
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            _starPayTransfer.Transfer(new TransferParmeter() { TransferID = 1 });
-
+            //调用第一个任务
+            _task.ExecuteTask(new TaskParmeter() { TaskID = 1 });
+     
             return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

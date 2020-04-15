@@ -11,9 +11,119 @@ namespace DapperDemo0003
     {
         static void Main(string[] args)
         {
-            InsertMethod();
-            Console.ReadLine();
+
+            TestQueryParentChild();
+            //Query();
+            //TestProc();
+            //InsertMethod();
+            //Console.ReadLine();
         }
+        static void TestQueryParentChild()
+        {
+            //查询失败
+            var connString = "Server=127.0.0.1;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"select * from parentchild";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var result = db.Query<Parent>(sql);
+                Console.WriteLine(result);
+            }
+        }
+        static void TestInsertParentChild()
+        {
+            //insert 改造后还好
+            var connString = "Server=127.0.0.1;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"insert into parentchild(name,children) values(@name,@children::json)";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var result = db.Execute(sql, new { Name = "张三", Children = new JsonList<Child> { new Child { ID = 1, Name = "child01" }, new Child { ID = 2, Name = "child02" } }.ToJson() });
+                Console.WriteLine(result);
+            }
+        }
+        class Parent
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+
+            public JsonList<Child> Children { get; set; }
+        }
+        class Child
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+        }
+        class JsonList<T> : List<T>
+        {
+            public string ToJson()
+            {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+            }
+        }
+
+        static void TestQueryEnum()
+        {
+            var connString = "Server=127.0.0.1;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"select * from  abc";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var result = db.Query<ABC>(sql);
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"id:{item.ID}  name:{item.Name}  sex:{item.Sex}  sex1:{item.Sex1}");
+                }
+            }
+        }
+
+        static void TestInsertEnum()
+        {
+            var connString = "Server=127.0.0.1;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"insert into abc(sex,name,sex1) values(@sex,@name,@sex1)";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var result = db.Execute(sql, new ABC { Name = "张三", Sex = Sex.Female, Sex1 = Sex.Male });
+                Console.WriteLine(result);
+            }
+        }
+
+        class ABC
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public Sex Sex { get; set; }
+            public Sex Sex1 { get; set; }
+        }
+        enum Sex
+        {
+            Male,
+            Female
+        }
+
+        static void Query()
+        {
+            //SqlMapper.AddTypeMap(typeof(DateTime), System.Data.DbType.DateTimeOffset);
+
+            var connString = "Server=127.0.0.1;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"select * from t4 where time=@time";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var time = DateTimeOffset.Parse("2020-01-21 23:59:59.999999").ToOffset(TimeSpan.FromHours(9));
+                var result = db.Query(sql, new { time }).SingleOrDefault();
+                Console.WriteLine(result.id);
+            }
+
+        }
+
+        static void TestProc()
+        {
+            var connString = "Server=13.94.40.38;Port=5432;UserId=postgres;Password=postgres2018;Database=postgres;";
+            var sql = @"call get_data()";
+            using (var db = new NpgsqlConnection(connString))
+            {
+                var result = db.Execute(sql);
+                Console.WriteLine($"insert into 结果：{result}");
+            }
+        }
+
 
         static void InsertMethod()
         {
@@ -58,8 +168,16 @@ on RolePermissions.PermissionID =Permissions.ID;";
                     Console.WriteLine(JsonConvert.SerializeObject(rolePermission));
                 }
             }
+
         }
     }
+    //static class DateTimeOffsetExt
+    //{
+    //    public static string ToLongString(this DateTimeOffset date)
+    //    {
+    //        return date.ToLongString();
+    //    }
+    //}
 
     public class RolePermissionModel
     {

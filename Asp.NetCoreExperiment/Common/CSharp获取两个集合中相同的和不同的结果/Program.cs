@@ -9,79 +9,108 @@ namespace CSharp获取两个集合中相同的和不同的结果
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("-------------------开始初始化集合");
-            var sw = new Stopwatch();
-            sw.Start();          
+            Test1();
+
+        }
+        static void Test1()
+        {
+            var comp = new ReconcileModelEqualityComparer();
+            var list1 = new List<Record>() { new Record { Name = "aaa", Quantity = 10 }, new Record { Name = "bbb", Quantity = 20 } };
+
+            var list2 = new List<Record>() { new Record { Name = "aaaa", Quantity = 10 }, new Record { Name = "bbb", Quantity = 20 } };
+            // var list = list1.Concat(list2).Except(list1.Intersect(list2, comp), comp);
+            var list = list1.Except(list1.Intersect(list2, comp), comp);
+        }
+        static void Test()
+        {
+            Console.WriteLine("-------------------开始初始化集合-------------------");
+            #region 制造数据
+            var watch = new Stopwatch();
+            watch.Start();
             var listA = new List<string>();
             var listB = new List<string>();
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
-                listA.Add("abcdefghigklmn12345" + i);
+                var id = Guid.NewGuid().ToString();
+                listA.Add(id);
             }
-            for (int i = 0; i < 100000; i++)
+            listB.AddRange(listA);
+            //制造B的差异数据
+            for (int i = 0; i < 10; i++)
             {
-                listB.Add("abcdefghigklmn12345" + (i + 25));
+                var tick = DateTime.Now.Ticks;
+                var random = new Random((int)(tick & 0xffffffffL) | (int)(tick >> 32));
+                var index = random.Next(1, 100000);
+                listB[index] = Guid.NewGuid().ToString();
             }
-            sw.Stop();
-            TimeSpan ts2 = sw.Elapsed;
-            Console.WriteLine("Stopwatch总共花费{0}ms.", ts2.TotalMilliseconds);
+            watch.Stop();
+            TimeSpan span = watch.Elapsed;
+            Console.WriteLine("制造数据总共花费{0}ms.", span.TotalMilliseconds);
+            #endregion
 
-            Console.WriteLine("-------------------开始比较");
-            //Console.WriteLine("listA集合");
-            //foreach (var item in listA)
-            //{
-            //    Console.WriteLine(item);
-            //}
-            //Console.WriteLine("listB集合");
-            //foreach (var item in listB)
-            //{
-            //    Console.WriteLine(item);
-            //}
-            //Console.WriteLine("listA和listB交集");
-            sw = new Stopwatch();
-            sw.Start();
-            var listC = listA.Intersect(listB);
-            sw.Stop();
-            ts2 = sw.Elapsed;
-            Console.WriteLine("Stopwatch总共花费{0}ms.", ts2.TotalMilliseconds);
-            //Console.WriteLine($"----------------相同的有：{listC.Count()}--------------------");
-            //foreach (var item in listC)
-            //{
-            //    Console.WriteLine(item);
-            //}
+            #region 比较
+            Console.WriteLine("-------------------开始比较-------------------");
             Console.WriteLine("-------------------listA中交集外---------------------");
-            sw = new Stopwatch();
-            sw.Start();
+            watch = new Stopwatch();
+            watch.Start();
             var listD = listA.Except(listA.Intersect(listB));
-            sw.Stop();
-            ts2 = sw.Elapsed;
-            Console.WriteLine("Stopwatch总共花费{0}ms.", ts2.TotalMilliseconds);
+            watch.Stop();
+            span = watch.Elapsed;
+            Console.WriteLine("listA中交集外 总共花费{0}ms.", span.TotalMilliseconds);
             foreach (var item in listD)
             {
                 Console.WriteLine(item);
             }
             Console.WriteLine("----------------------listB中交集外--------------------");
-            sw = new Stopwatch();
-            sw.Start();
+            watch = new Stopwatch();
+            watch.Start();
             var listE = listB.Except(listA.Intersect(listB));
-            sw.Stop();
-            ts2 = sw.Elapsed;
-            Console.WriteLine("Stopwatch总共花费{0}ms.", ts2.TotalMilliseconds);
+            watch.Stop();
+            span = watch.Elapsed;
+            Console.WriteLine("listB中交集外 总共花费{0}ms.", span.TotalMilliseconds);
             foreach (var item in listE)
             {
                 Console.WriteLine(item);
             }
             Console.WriteLine("--------------listA和listB中交集外-------------------");
-            sw = new Stopwatch();
-            sw.Start();
+            watch = new Stopwatch();
+            watch.Start();
             var listF = listA.Concat(listB).Except(listA.Intersect(listB));
-            sw.Stop();
-            ts2 = sw.Elapsed;
-            Console.WriteLine("Stopwatch总共花费{0}ms.", ts2.TotalMilliseconds);
+            watch.Stop();
+            span = watch.Elapsed;
+            Console.WriteLine("listA和listB中交集外 总共花费{0}ms.", span.TotalMilliseconds);
             foreach (var item in listF)
             {
                 Console.WriteLine(item);
             }
+            #endregion
+        }
+    }
+    public class Record
+    {
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+     
+    }
+    public class ReconcileModelEqualityComparer : IEqualityComparer<Record>
+    {
+        public bool Equals(Record item1, Record item2)
+        {
+            if (item1 == null && item2 == null)
+                return true;
+            else if ((item1 != null && item2 == null) ||
+                    (item1 == null && item2 != null))
+                return false;
+
+       
+            return item1.Quantity.Equals(item2.Quantity) &&
+                   item1.Name.Equals(item2.Name);
+          
+        }
+
+        public int GetHashCode(Record item)
+        {
+            return new { item.Name, item.Quantity }.GetHashCode();
         }
     }
 }

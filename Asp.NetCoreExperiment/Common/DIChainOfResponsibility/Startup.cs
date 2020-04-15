@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace DIChainOfResponsibility
 {
@@ -19,29 +20,29 @@ namespace DIChainOfResponsibility
         public void ConfigureServices(IServiceCollection services)
         {
             //职责链依赖注入
-            services.AddChainOfResponsibility();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddScoped<EndTask>();
+            services.AddScoped<ThirdTask>();
+            services.AddScoped<SecondTask>();
+            services.AddScoped<FirstTask>();
+
+            //错误姿势
+            //services.AddScoped<ITask,EndTask>();
+            //services.AddScoped<ITask, ThirdTask>();
+            //services.AddScoped<ITask, SecondTask>();
+            //services.AddScoped<ITask, FirstTask>();
+
+            services.AddControllers();
         }
 
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseMvc();
-        }
-    }
-    static class ChainOfResponsibilityExtension
-    {
-        public static void AddChainOfResponsibility(this IServiceCollection services)
-        {
-            services.AddTransient(typeof(EndTransfer));
-            services.AddTransient(typeof(ThirdTransfer));
-            services.AddTransient(typeof(SecondTransfer));
-            services.AddTransient<ParentTransfer, FirstTransfer>();     
+                endpoints.MapControllers();
+            });
         }
     }
 }

@@ -24,10 +24,10 @@ namespace MuiltDIDemo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IJK, JK1>();      
-            services.AddTransient<IJK, JK2>();       
+            //services.AddTransient<IJK, JK1>();      
+            //services.AddTransient<IJK, JK2>();
 
-            //第一种
+            ////第一种
             //services.AddSingleton(factory =>
             //{
 
