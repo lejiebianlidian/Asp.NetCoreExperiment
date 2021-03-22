@@ -1,33 +1,43 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using RateLimitDemo01.Models;
 
 namespace RateLimitDemo01.Controllers
 {
-    public class HomeController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class HomeController : ControllerBase
     {
-        public IActionResult Index()
+
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
         {
-            return View();
-        }
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            _logger = logger;
         }
 
-        [HttpGet("test")]
-        public IActionResult Test()
+        [HttpGet("/none")]
+        public string None()
         {
-            return Ok();
+            return $"None Ok,{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
+        }
+        [HttpGet("/whiteip1")]
+        public string WhiteIP1()
+        {
+            return $"White1 IP Ok,{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
+        }
+        [HttpGet("/whiteip2")]
+        public string WhiteIP2()
+        {
+            return $"White2 IP Ok,{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
+        }
+        [HttpGet("/clientid")]
+        public string ClientID()
+        {
+            return $"Client ID Ok,{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
         }
     }
 }

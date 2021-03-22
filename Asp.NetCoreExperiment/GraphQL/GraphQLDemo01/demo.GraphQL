@@ -1,0 +1,55 @@
+﻿{
+   products(where: { name:{  contains:"Ball"}  }) {
+      name
+      productNumber
+      sellStartDate      
+     }
+ }
+
+
+
+ {
+   persons( order: [{ firstName: ASC }] ){
+      pageInfo{
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      nodes{
+         firstName
+         middleName
+         lastName
+         emailAddresses{
+            emailAddressId
+            emailAddress1
+            modifiedDate
+         }
+      }
+      edges{
+         cursor
+         node{
+            firstName
+         }
+      }
+     }     
+ }
+
+
+
+ {
+   products( order: [{ productId: ASC }] skip:40 take:20){
+      pageInfo{
+        hasNextPage
+        hasPreviousPage    
+      }
+      items{
+         productId
+         name
+      }
+   }
+     
+ }
+
+
+

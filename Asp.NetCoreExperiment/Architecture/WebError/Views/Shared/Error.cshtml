@@ -1,0 +1,20 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "错误";
+}
+
+<h1 class="text-danger">错误</h1>
+<h2 class="text-danger">一个请求处理错误</h2>
+
+@if (Model.ShowRequestId)
+{
+    <h3>@Model.ErrorType</h3>
+    <p>
+        <strong>请求ID:</strong> <code>@Model.RequestId</code>
+    </p>
+
+    <p>
+        @Model.ErrorMessage
+    </p>
+}
+

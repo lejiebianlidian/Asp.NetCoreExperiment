@@ -1,0 +1,5 @@
+﻿
+extend type Query{
+  getonestudent(stuNo:String): Student @delegate(schema: "students", path:"student(stuNo:$arguments:stuNo)")
+  getstudents: [Student] @delegate(schema: "students", path:"students")
+}
